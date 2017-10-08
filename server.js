@@ -18,7 +18,7 @@ mongoose.connect(config.uri, { useMongoClient: true }, (err) => {
 
 
 // Static Files
-app.use(express.static(__dirname + '/client/dist/'));
+app.use(express.static(__dirname + '/myApp/dist/'));
 // Middlewares
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
