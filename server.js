@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const config = require('./config/database');
 const mainRoute = require('./routes/index');
+const cors = require('cors');
 
 // ES6 Promise
 mongoose.Promise = global.Promise;
@@ -14,7 +15,12 @@ mongoose.connect(config.uri, { useMongoClient: true }, (err) => {
 	}else {
 		console.log('Connected to database: ' + config.db);
 	}
-})
+});
+
+// Cross Origin Middleware
+app.use(cors({
+	origin: 'http://localhost:4200'
+}))
 
 
 // Static Files
@@ -28,7 +34,7 @@ app.use('/', mainRoute);
 
 // All routes to client index
 app.get('*', (req, res) => {
-	res.sendFile(path.join(__dirname + '/client/dest/index.html'));
+	res.sendFile(path.join(__dirname + '/myApp/dest/index.html'));
 })
 
 
