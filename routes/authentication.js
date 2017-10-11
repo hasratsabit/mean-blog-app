@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
+const jwt = require('jsonwebtoken');
+const config = require('../config/database');
 
 
 /******************************
@@ -127,6 +129,51 @@ router.get('/checkUsername/:username', (req, res) => {
 });
 
 /*****************************/
+
+/******************************
+	Username Availability Route
+******************************/
+router.post('/login', (req, res) => {
+	if(!req.body.username){
+		// Check if the username typed. 
+		res.json({ success: false, message: 'No username was provided'});
+	}else {
+		// Check if the password is typed.
+		if(!req.body.password){
+			res.json({ success: false, message: 'No password was provided'});
+		}else {
+			// Find the username in database.
+			User.findOne({ username: req.body.username.toLowerCase()}, (err, user) => {
+				// Check if there is an error.
+				if(err){
+					res.json({ success: false, message: err });
+				}else {
+					// Respond if the user doesn't exist.
+					if(!user){
+						res.json({ success: false, message: 'Username does not exist.'})
+					}else {
+						// Compare the user password and database. Compare password method is created in the model.
+						const validPassword = user.comparePassword(req.body.password)
+						// Respond if the password doesn't match in the database.
+						if(!validPassword){
+							res.json({ success: false, message: 'Password is incorrect.'});
+						}else {
+							// Create the token. Send the user ID from the user object.
+							const token = jwt.sign({ userId: user._id}, config.secret, { expiresIn: '24h'});
+							// Log in the user and pass the token and username.
+							res.json({ success: true, message: 'Successfully logged in.', token: token, user: { username: user.username } })
+						}
+					}
+				}
+			})
+		}
+	}
+})
+
+
+
+
+
 
 
 module.exports = router;

@@ -4,10 +4,12 @@ import { NgModule } from "@angular/core";
 import { HomeComponent } from "./components/home/home.component";
 import { DashboardComponent } from "./components/dashboard/dashboard.component";
 import { RegisterComponent } from "./components/register/register.component";
+import { LoginComponent } from "./components/login/login.component";
 
 // All the Routes
 const appRoutes: Routes = [
 	{ path: 'register', component: RegisterComponent },
+	{ path: 'login', component: LoginComponent },
 	{ path: 'dashboard', component: DashboardComponent },
 	{	path: '**', component: HomeComponent }
 ]

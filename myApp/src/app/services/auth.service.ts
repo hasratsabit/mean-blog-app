@@ -7,6 +7,8 @@ export class AuthService {
 
 
   domain = "http://localhost:3000";
+  authToken;
+  user;
 
   constructor(
     private http: Http
@@ -25,9 +27,9 @@ export class AuthService {
 
 
 
-/**********************
-	Get Email Availability.
-***********************/
+/**************************
+	Check Email Availability.
+***************************/
 
 // Function to check if e-mail is taken
 checkEmail(email) {
@@ -37,9 +39,9 @@ checkEmail(email) {
 /**************************/
 
 
-/**********************
-	Get Username Availability.
-***********************/
+/******************************
+	Check Username Availability.
+******************************/
 
 // Function to check if username is taken
 checkUsername(username) {
@@ -48,6 +50,31 @@ checkUsername(username) {
 
 /**************************/
 
+/*********************************
+  Login Request.
+**********************************/
+
+// Function to login user
+login(user) {
+  return this.http.post(this.domain + '/authentication/login', user).map(res => res.json());
+}
+
+/**************************/
+
+
+
+/*********************************
+	Store User Data in the browser.
+**********************************/
+
+// Function to store user's data in client local storage
+ storeUserData(token, user) {
+   localStorage.setItem('token', token); // Set token in local storage
+   localStorage.setItem('user', JSON.stringify(user)); // Set user in local storage as string
+   this.authToken = token; // Assign token to be used elsewhere
+   this.user = user; // Set user to be used elsewhere
+ }
+/**************************/
 
 
 }
