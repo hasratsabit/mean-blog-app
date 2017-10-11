@@ -9,10 +9,43 @@ export class AuthService {
   domain = "http://localhost:3000";
   authToken;
   user;
+  options;
 
   constructor(
     private http: Http
   ) { }
+
+  /**********************
+  	Create Headers
+  ***********************/
+
+    // The header is created to be sent to the backend so the API authenticates the user to get the profile information.
+  createAuthenticationHeaders() {
+    // The load token method from bellow is called to get the token from the browser when user is signed in
+    this.loadToken(); // Get token so it can be attached to headers
+    // Headers configuration options
+    this.options = new RequestOptions({
+      headers: new Headers({
+        'Content-Type': 'application/json', // Format set to JSON
+        'authorization': this.authToken // Attach token
+      })
+    });
+  }
+
+/**************************/
+
+
+
+  /**********************
+  	Load Token
+  ***********************/
+  // Function to get token from client local storage
+  loadToken() {
+    this.authToken = localStorage.getItem('token');; // Get token and asssign to variable to be used elsewhere
+  }
+
+  /**************************/
+
 
 
 /**********************
@@ -51,15 +84,34 @@ checkUsername(username) {
 /**************************/
 
 /*********************************
+  Logout
+**********************************/
+  logout() {
+    this.authToken = null;
+    this.user = null;
+    localStorage.clear()
+  }
+
+
+/*********************************
   Login Request.
 **********************************/
-
-// Function to login user
 login(user) {
   return this.http.post(this.domain + '/authentication/login', user).map(res => res.json());
 }
+/**************************/
+
+/*********************************
+	Get Profile Http.
+**********************************/
+
+  getProfile(){
+    this.createAuthenticationHeaders();
+    return this.http.get(this.domain + '/authentication/profile', this.options).map(res => res.json());
+  }
 
 /**************************/
+
 
 
 

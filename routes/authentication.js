@@ -135,7 +135,7 @@ router.get('/checkUsername/:username', (req, res) => {
 ******************************/
 router.post('/login', (req, res) => {
 	if(!req.body.username){
-		// Check if the username typed. 
+		// Check if the username typed.
 		res.json({ success: false, message: 'No username was provided'});
 	}else {
 		// Check if the password is typed.
@@ -170,8 +170,55 @@ router.post('/login', (req, res) => {
 	}
 })
 
+/*****************************/
 
 
+
+/******************************
+	Header Middleware
+******************************/
+
+	// This Middleware intercepts the header and authorizes the user to access info.
+	// Any route after this have to pass through this middleware.
+
+	router.use((req, res, next) => {
+		const token = req.headers['authorization'] // The name is given in front service.
+		if(!token){
+			res.json({ success: false, message: 'No token is provided.'});
+		}else {
+			jwt.verify(token, config.secret, (err, decoded) => {
+				if(err){
+					res.json({ success: false, message: 'Token invalid: ' + err})
+				}else {
+					req.decoded = decoded;
+					next();
+				}
+			})
+		}
+	})
+
+/*****************************/
+
+
+/******************************
+	Get Profile
+******************************/
+
+	router.get('/profile', (req, res) => {
+		User.findOne({ _id: req.decoded.userId }).select('username email').exec((err, user) => {
+			if(err){
+				res.json({ success: false, message: err})
+			}else {
+				if(!user){
+					res.json({ success: false, message: 'User not found.'})
+				}else {
+					res.json({ success: true, user: user });
+				}
+			}
+		})
+	})
+
+/*****************************/
 
 
 
