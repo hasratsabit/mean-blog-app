@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormControl } from "@angular/forms";
 import { AuthService } from "../../services/auth.service";
 import { Router } from "@angular/router";
+import { AuthGuard } from "../../guard/auth.guard";
 
 
 @Component({
@@ -15,11 +16,13 @@ export class LoginComponent implements OnInit {
   message;
   processing = false;
   form: FormGroup;
+  previousUrl // Variable stores the url user trying to access.
 
   constructor(
     private formBuilder: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private authGuard: AuthGuard
   ) {
       this.createForm();
     }
@@ -88,7 +91,12 @@ export class LoginComponent implements OnInit {
         this.authService.storeUserData(data.token, data.user);
         // After 2 seconds, redirect to dashboard page
         setTimeout(() => {
-          this.router.navigate(['/dashboard']); // Navigate to dashboard view
+          if(this.previousUrl){
+            // If there is a previous url when a user loggedin, redirect them to that url.
+            this.router.navigate([this.previousUrl]);
+          }else{
+            this.router.navigate(['/dashboard']); // Navigate to dashboard view
+          }
         }, 2000);
       }
     });
@@ -97,6 +105,13 @@ export class LoginComponent implements OnInit {
 
 
   ngOnInit() {
+    // As soon as the browser is loaded, we check for url that user may searched.
+    if(this.authGuard.redirectUrl) {
+      this.messageClass = "alert alert-danger";
+      this.message = "You must be logged in to view this page";
+      this.previousUrl = this.authGuard.redirectUrl; // Use this variable in the login above.
+      this.authGuard = undefined;
+    }
   }
 
 }
