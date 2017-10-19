@@ -124,6 +124,10 @@ export class BlogComponent implements OnInit {
 
   /*****************************/
 
+
+  /******************************
+  	Reload All Blogs
+  ******************************/
   reloadBlogs() {
     this.loadingBlogs = true;
     this.getAllBlogs(); // Fire this function every time the reload is pressed.
